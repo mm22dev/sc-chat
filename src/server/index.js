@@ -1,5 +1,5 @@
 const express = require('express')
-const { connectToMongoDB } = require('./utils/lib')
+const { connectToMongoDB, verifyAuthToken } = require('./utils/lib')
 const { ApolloServer } = require('apollo-server-express')
 const { readFileSync } = require('fs')
 const resolvers = require('./resolvers')
@@ -12,7 +12,8 @@ const startServer = async () => {
   const typeDefs = readFileSync('./src/server/typeDefs.graphql', 'UTF-8')
   const apolloServer = new ApolloServer({
     typeDefs,
-    /* resolvers */
+    resolvers,
+    context: ({ req }) => verifyAuthToken(req.header('x-auth-token'))
   })
 
   apolloServer.applyMiddleware({app}) 

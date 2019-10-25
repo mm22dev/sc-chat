@@ -1,3 +1,24 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
 type Query {
-  hello: String
+  login(email: String!, password: String!): AuthPayload!
+  listUsers: [User!]
+}
+
+type Mutation {
+  signUp(name: String!, email: String!, password: String!): User!
+  confirmRegistration(token: String!): User!
+  recoverPassword(email: String!): User!
+  updateUserAccount(name: String, password: String): User!
+  deleteUserAccount(password: String!): User!
 }
