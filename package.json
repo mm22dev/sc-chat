@@ -1,0 +1,46 @@
+{
+  "name": "sc_chat",
+  "version": "1.0.0",
+  "description": "Basic JS Chat",
+  "main": "server.js",
+  "scripts": {
+    "clear": "rm -f server.js server.js.map",
+    "build-dev-server": "webpack --mode development --config webpack.server.config.js",
+    "server": "concurrently \"npm run build-dev-server -- -w\" \"nodemon server.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mm22dev/sc-chat.git"
+  },
+  "keywords": [
+    "chat",
+    "GraphQL"
+  ],
+  "author": "mm22dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mm22dev/sc-chat/issues"
+  },
+  "homepage": "https://github.com/mm22dev/sc-chat#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "concurrently": "^5.0.0",
+    "nodemon": "^1.19.4",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.9.7",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "graphql": "^14.5.8",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.7",
+    "nodemailer": "^6.3.1",
+    "validator": "^11.1.0"
+  }
+}
