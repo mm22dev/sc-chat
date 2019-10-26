@@ -1,5 +1,8 @@
 const mongoose = require('mongoose')
 
+// Trick the deprecation as expressed by Mongoose documentation
+mongoose.set('useFindAndModify', false)
+
 const mongoDBPrefix = process.env.SC_MONGODB_PREFIX || 'mongodb'
 const mongoDBUsr = process.env.SC_MONGODB_USR ? `${process.env.SC_MONGODB_USR}:` : ''
 const mongoDBPsw = process.env.SC_MONGODB_PSW ? `${process.env.SC_MONGODB_PSW}@` : ''
@@ -20,4 +23,6 @@ const connectToMongoDB = async () => await mongoose
   .then( () => console.log('MongoDB connected ...'))
   .catch( err => console.log(err) )
 
-module.exports = { connectToMongoDB }
+const ObjectId = stringId => mongoose.Types.ObjectId(stringId)
+
+module.exports = { connectToMongoDB, ObjectId }

@@ -12,6 +12,7 @@ const fakeAccountTrasporter = nodemailer.createTransport({
 
 const sendVerificationEmail = async (userName, emailAddress, verificationToken) => {  
   try {
+
     const response = await fakeAccountTrasporter.sendMail({
       from: '"Mister X" <misterX@sc.com>',
       to: `"${userName}" <${emailAddress}>`,
@@ -22,6 +23,7 @@ const sendVerificationEmail = async (userName, emailAddress, verificationToken) 
     })
     if(!response) throw new Error('Cannot send account verification email')
     return Promise.resolve(response)
+
   } catch (err) {
     throw err
   }
@@ -29,6 +31,7 @@ const sendVerificationEmail = async (userName, emailAddress, verificationToken) 
 
 const sendPasswordRecoveryEmail = async (userName, emailAddress, tmpPassword) => {
   try {
+
     const response = await fakeAccountTrasporter.sendMail({
       from: '"Mister X" <misterX@sc.com>',
       to: `"${userName}" <${emailAddress}>`,
@@ -40,6 +43,7 @@ const sendPasswordRecoveryEmail = async (userName, emailAddress, tmpPassword) =>
     })
     if(!response) throw new Error('Cannot send password recovery email')
     return Promise.resolve(response)
+    
   } catch (err) {
     throw err
   }

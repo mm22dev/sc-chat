@@ -14,15 +14,17 @@ const verifyAuthToken = async (token) => {
         
         authToken = token
 
-        // Get userId from jwt payload
-        const { userId } = jwt.verify(authToken, process.env.SC_JWT_SECRET || '123456')
-        const user = await User.findById(userId)
+        // Get user from user id in jwt payload
+        const decodedJwt = jwt.verify(authToken, process.env.SC_JWT_SECRET || '123456')
+        const userId = decodedJwt.hasOwnProperty("userId") ? decodedJwt.userId : null
+        const user = userId ? await User.findById(userId) : null
 
         currentUser = !user
           ? currentUser
           : {
             id: user._id,
             name: user.name,
+            email: user.email,
             isVerified: user.isVerified
           }  
 

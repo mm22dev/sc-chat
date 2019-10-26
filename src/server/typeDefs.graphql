@@ -10,9 +10,33 @@ type AuthPayload {
   user: User
 }
 
+enum Accessibility {
+  PUBLIC
+  PRIVATE
+}
+
+type Channel {
+  id: ID!
+  name: String!
+  authorId: String!
+  accessibility: Accessibility!
+  createdBy: User!
+  createdAt: DateTime!
+}
+
+type Message {
+  id: ID!
+  content: String!
+  authorId: String!
+  channelId: String!
+  writtenBy: User!
+}
+
 type Query {
   login(email: String!, password: String!): AuthPayload!
-  listUsers: [User!]
+  listChannels: [Channel!]
+  listChannelMessages(channelId: String!): [Message!]
+  filterMessages(channelId: String!, author: String, text: String): [Message!]
 }
 
 type Mutation {
@@ -21,4 +45,12 @@ type Mutation {
   recoverPassword(email: String!): User!
   updateUserAccount(name: String, password: String): User!
   deleteUserAccount(password: String!): User!
+  createChannel(channelName: String!): Channel!
+  deleteChannel(channelId: String!): Channel!
+  setChannelAccessibility(channelId: String, accessibility: Accessibility!): Channel!
+  inviteUserToChannel(channelId: String!, email: String!): User!
+  kickOutUserFromChannel(channelId: String!, email: String!): User!
+  createMessage(channelId: String!, text: String!): Message!
+  updateOwnMessage(messageId: String!, text: String!): Message!
+  deleteOwnMessage(messageId: String!): Message!
 }
