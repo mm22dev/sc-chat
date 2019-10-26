@@ -9,7 +9,8 @@ module.exports = function (api) {
           "node": "10"
         }
       }
-    ]
+    ], 
+    "@babel/preset-react" 
   ]
 
   return { presets }
