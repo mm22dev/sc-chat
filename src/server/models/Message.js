@@ -14,6 +14,7 @@ const MessageSchema = new Schema({
     type: String,
     require: true,
   },
+  attachment: Object,
   metadataList: Array,
   writtenAt: {
     type: Date,

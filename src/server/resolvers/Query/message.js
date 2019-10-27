@@ -12,11 +12,11 @@ const listChannelMessages = makeRequestPrivate(
       const channel = await Channel.findById(channelId)
       if(!channel) throw new Error('Please insert a valid channel id')
       const { accessibility, members } = channel
-      if(accessibility==='PRIVATE' && !members.find( member => member.toString() === currentUser.id.toString())) throw new Error('Cannot get messages from private channel')
+      if(accessibility==='PRIVATE' && !members.find( member => member.toString() === currentUser.id.toString())) throw new Error('Cannot read messages from private channel')
 
       // Return channel messages
-      return Message.find({ channelId: ObjectId(channelId) }) 
-    } catch (error) {
+      return Message.find({ channelId: ObjectId(channelId) }).sort({ writtenAt: -1 }) 
+    } catch (err) {
       throw err
     }
   }
@@ -48,7 +48,7 @@ const filterMessages = makeRequestPrivate(
           { $lookup: lookup },
           { $unwind: '$authorName' },
           { $match: { ...filterByAuthor, ...filterByContent }}
-        ])
+        ]).sort({ writtenAt: -1 }) 
         
       // Return matching messages  
       return Promise.resolve(messages.map( message => ({id: message._id, ...message }) ))

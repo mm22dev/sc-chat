@@ -2,6 +2,7 @@ const User = require('../../models/User')
 const Registration = require('../../models/Registration')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 const crypto = require('crypto-random-string')
 const { makeRequestPrivate, sendVerificationEmail, sendPasswordRecoveryEmail } = require('../../utils/lib')
 
@@ -40,11 +41,11 @@ const confirmRegistration = async (parent, { token }) => {
   try {
 
     // Check for existing (unique) token and get related user id
-    const { userId } = await Registration.findOneAndRemove({ token })
-    if(!userId) throw new Error('No registration pending')
+    const registration = await Registration.findOneAndRemove({ token })
+    if(!registration) throw new Error('No registration pending')
 
     return User.findOneAndUpdate(
-      { _id: userId }, 
+      { _id: registration.userId }, 
       { $set: { isVerified: true } }, 
       { new: true }
     )
@@ -52,6 +53,41 @@ const confirmRegistration = async (parent, { token }) => {
   } catch (err) {
     throw err
   }
+}
+
+// @desc    Authenticate the user
+// @access  Public
+const login = async (parent, { email, password }) => {
+  try {
+    // Simple validation
+    if(validator.isEmpty(email) || validator.isEmpty(password)) throw new Error('Please enter all fields')
+    if(!validator.isEmail(email)) throw new Error('Please enter a valid email address')
+    
+    // Email validation
+    const matchingUser = await User.findOne({ email })
+    if(!matchingUser) throw new Error('E-mail mismatching')
+
+    // Check user verification
+    if(!matchingUser.isVerified) throw new Error("An email confirmation has been sent to your primary email address. Please check your inbox and click the confirmation link")
+
+    // Password validation
+    const pswMatch = await bcrypt.compare(password, matchingUser.password)
+    if(!pswMatch) throw new Error('Invalid credentials')
+
+    // Generate token
+    const token = await jwt.sign(
+      { userId: matchingUser._id }, 
+      process.env.SC_JWT_SECRET || '123456',
+      { expiresIn: 7200 }
+    )
+
+    const user = { id: matchingUser._id, name: matchingUser.name }
+    return Promise.resolve({ token, user })
+
+  } catch (err) {
+    throw err
+  }
+
 }
 
 // @desc    Recovery lost password
@@ -78,7 +114,7 @@ const recoverPassword = async (parent, { email }) => {
     // Send email with temporary password
     await sendPasswordRecoveryEmail(carelessUser.name, carelessUser.email, tmpPassword)
     
-    return Promise.resolve({ id: carelessUser.id, name: carelessUser.name })
+    return Promise.resolve('Check your e-mail')
 
   } catch (err) {
     throw err
@@ -89,27 +125,34 @@ const recoverPassword = async (parent, { email }) => {
 // @desc    Update user account
 // @access  Private
 const updateUserAccount = makeRequestPrivate(
-  async (parent, { name, password }, { currentUser }) => {
+  async (parent, { newName, newPassword, currentPassword }, { currentUser }) => {
     try {
 
       // Simple validation
-      if(validator.isEmpty(name) && validator.isEmpty(password)) throw new Error('Please update at least one field')
-      if(!validator.isEmpty(password) && password.length<8) throw new Error('Password must be at least 8 characters')
+      if(validator.isEmpty(newName) && validator.isEmpty(newPassword)) throw new Error('Please update at least one field')
+      if(!validator.isEmpty(newPassword) && newPassword.length<8) throw new Error('New password must be at least 8 characters')
+      if(validator.isEmpty(currentPassword)) throw new Error('Plese provide current password to perform operation.')
 
-      // Hash password if supllied
+      // Verify current password
+      const matchingUser = await User.findOne({ email: currentUser.email })
+      if(!matchingUser) throw new Error('Operation denied')
+      const pswMatch = await bcrypt.compare(currentPassword, matchingUser.password)
+      if(!pswMatch) throw new Error('The inserted current password is uncorrect')
+
+      // Hash new password if supplied
       let hash = null
-      if(password){
+      if(newPassword){
         const salt = await bcrypt.genSalt(10)       
-        hash = await bcrypt.hash(password, salt)
+        hash = await bcrypt.hash(newPassword, salt)
       }
 
       // Update user and return it
       return User.findOneAndUpdate(
         { _id: currentUser.id },
         { $set: {
-          ...(name && { name }), 
-          ...(password && { password: hash })},
-          ...((name || password) && { updatedAt: Date.now() })
+          ...(newName && { name: newName }), 
+          ...(newPassword && { password: hash })},
+          ...((newName || newPassword) && { updatedAt: Date.now() })
         },
         { new: true }
       )
@@ -148,6 +191,7 @@ const deleteUserAccount = makeRequestPrivate(
 module.exports = { 
   signUp, 
   confirmRegistration, 
+  login,
   recoverPassword, 
   updateUserAccount, 
   deleteUserAccount

@@ -1,5 +1,6 @@
 const { GraphQLScalarType } = require('graphql')
 const User = require('../models/User')
+const Channel = require('../models/Channel')
 
 module.exports = {
 
@@ -12,9 +13,13 @@ module.exports = {
     parseLiteral: ast => ast.value
   }),
 
-  // Channel edge to get channel's author
+  // Channel edge to get channel's author and memberList
   Channel: {
-    createdBy: parent => User.findById(parent.authorId)
+    createdBy: parent => User.findById(parent.authorId),
+    memberList: async parent => {
+      const channel = await Channel.findById(parent.id)
+      return User.find({ _id: { $in: channel.members } })
+    }
   },
 
   // Message edge to get message's author

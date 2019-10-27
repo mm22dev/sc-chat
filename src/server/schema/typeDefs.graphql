@@ -20,6 +20,7 @@ type Channel {
   name: String!
   authorId: String!
   accessibility: Accessibility!
+  memberList: [User!]!
   createdBy: User!
   createdAt: DateTime!
 }
@@ -30,10 +31,10 @@ type Message {
   authorId: String!
   channelId: String!
   writtenBy: User!
+  writtenAt: DateTime!
 }
 
 type Query {
-  login(email: String!, password: String!): AuthPayload!
   listChannels: [Channel!]
   listChannelMessages(channelId: String!): [Message!]
   filterMessages(channelId: String!, author: String, text: String): [Message!]
@@ -42,15 +43,16 @@ type Query {
 type Mutation {
   signUp(name: String!, email: String!, password: String!): User!
   confirmRegistration(token: String!): User!
-  recoverPassword(email: String!): User!
-  updateUserAccount(name: String, password: String): User!
+  login(email: String!, password: String!): AuthPayload!
+  recoverPassword(email: String!): String!
+  updateUserAccount(newName: String, newPassword: String, currentPassword: String): User!
   deleteUserAccount(password: String!): User!
   createChannel(channelName: String!): Channel!
   deleteChannel(channelId: String!): Channel!
   setChannelAccessibility(channelId: String, accessibility: Accessibility!): Channel!
   inviteUserToChannel(channelId: String!, email: String!): User!
   kickOutUserFromChannel(channelId: String!, email: String!): User!
-  createMessage(channelId: String!, text: String!): Message!
-  updateOwnMessage(messageId: String!, text: String!): Message!
+  createMessage(channelId: String!, text: String, file: Upload): Message!
+  updateOwnMessage(messageId: String!, text: String, file: Upload): Message!
   deleteOwnMessage(messageId: String!): Message!
 }

@@ -2,11 +2,11 @@ const nodemailer = require('nodemailer')
 
 // Fake account from https://ethereal.email
 const fakeAccountTrasporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
+  host: process.env.SC_MAIL_TRASPORTER_HOST || 'smtp.ethereal.email',
+  port: process.env.SC_MAIL_TRASPORTER_PORT || 587,
   auth: {
-    user: 'noble74@ethereal.email',
-    pass: 'gVh9g7PkvXnuSzhzkJ'
+    user: process.env.SC_MAIL_TRASPORTER_USR || 'noble74@ethereal.email',
+    pass: process.env.SC_MAIL_TRASPORTER_PSW ||'gVh9g7PkvXnuSzhzkJ'
   }
 })
 
@@ -19,7 +19,7 @@ const sendVerificationEmail = async (userName, emailAddress, verificationToken) 
       subject: "Please confirm your Email account",
       html: `Hello ${userName},<br>
         One last step before accessing this fantastic Chat.<br>
-        <a href="http://localhost:5001/verify?token=${verificationToken}">Click here to verify your email</a><br>`
+        <a href="http://localhost:3000/#/verify/${userName}/${verificationToken}">Click here to verify your email</a><br>`
     })
     if(!response) throw new Error('Cannot send account verification email')
     return Promise.resolve(response)

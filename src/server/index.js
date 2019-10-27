@@ -3,6 +3,7 @@ const { connectToMongoDB, verifyAuthToken } = require('./utils/lib')
 const { ApolloServer } = require('apollo-server-express')
 const { readFileSync } = require('fs')
 const resolvers = require('./resolvers')
+const path = require('path')
 
 const startServer = async () => {
   const app = express()
@@ -15,14 +16,14 @@ const startServer = async () => {
     resolvers,
     context: ({ req }) => verifyAuthToken(req.header('x-auth-token'))
   })
-
+  
   apolloServer.applyMiddleware({app}) 
 
-  app.get('/', (req, res) => res.status(200).send('Hello world'))
+  app.use(express.static(path.join(__dirname, '/dist')))
 
   app.listen({port: 5001}, () => {
-    console.log('🚀 Server running on http://localhost:5001')
-    console.log(`GraphQL Server running at http://localhost:5001${apolloServer.graphqlPath}`)
+      console.log('🚀 Server running on http://localhost:5001')
+      console.log(`GraphQL Server running at http://localhost:5001${apolloServer.graphqlPath}`)
   })
 }
 

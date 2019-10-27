@@ -17,7 +17,7 @@ const getMetadataList = async content => {
 
     return Promise.resolve(metadataList)
 
-  } catch (error) {
+  } catch (err) {
     throw err
   }
 }

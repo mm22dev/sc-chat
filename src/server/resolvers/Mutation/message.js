@@ -1,17 +1,17 @@
 const Channel = require('../../models/Channel')
 const Message = require('../../models/Message')
 const validator = require('validator')
-const { makeRequestPrivate, ObjectId, getMetadataList } = require('../../utils/lib')
+const { makeRequestPrivate, ObjectId, uploadFile, getMetadataList } = require('../../utils/lib')
 
 // @desc    Insert new message
 // @access  Private
 const createMessage = makeRequestPrivate(
-  async (parent, { channelId, text }, { currentUser }) => {
+  async (parent, { channelId, text, file }, { currentUser }) => {
     try {
-
+      
       // Simple validation
-      const content = text.toString().trim()
-      if(validator.isEmpty(content)) throw new Error('Please send not empty messages')
+      let content = text ? text.toString().trim() : ''
+      if(validator.isEmpty(content) && !file) throw new Error('Please send not empty messages')
       const channel = await Channel.findById(channelId)
       if(!channel) throw new Error('Please insert a valid channel id')
 
@@ -21,20 +21,28 @@ const createMessage = makeRequestPrivate(
 
       // Get any url metadata
       const metadataList = await getMetadataList(content)
+
+      // Get any file attached
+      let attachment = file ? await uploadFile(file) : null
+      // Append download link to content if it is not an image
+      content += attachment && !['image/jpeg', 'image/png'].includes(attachment.mimetype) 
+        ? `Download attachment from http://localhost:5001/${attachment.path}`
+        : ''
       
       // Store Message
       const newMessage = await new Message({ 
         content, 
         authorId: ObjectId(currentUser.id), 
         channelId: ObjectId(channelId) ,
+        ...(attachment && { attachment }),
         ...(metadataList && { metadataList })
       }).save()
       if(!newMessage) throw new Error('Error storing message')
 
       // Return stored message
-      const { _id, authorId } = newMessage
+      const { _id, authorId, writtenAt } = newMessage
       const writtenBy = { ...currentUser }
-      return Promise.resolve({ id: _id, content, channelId, authorId, writtenBy })
+      return Promise.resolve({ id: _id, content, channelId, authorId, writtenBy, writtenAt })
       
     } catch (err) {
       throw err
@@ -45,18 +53,25 @@ const createMessage = makeRequestPrivate(
 // @desc    Update own message
 // @access  Private
 const updateOwnMessage = makeRequestPrivate(
-  async (parent, { messageId, text }, { currentUser }) => {
+  async (parent, { messageId, text, file }, { currentUser }) => {
     try {
 
       // Simple validation
-      const content = text.toString().trim()
+      let content = text ? text.toString().trim() : ''
       const message = await Message.findById(messageId)
       if(!message) throw new Error('Message id is not valid')
       if(message.authorId.toString()!==currentUser.id.toString()) throw new Error('Cannot update messages written by other user')
-      if(validator.isEmpty(content)) throw new Error('Please send not empty messages')
+      if(validator.isEmpty(content) && !file) throw new Error('Please send not empty messages')
 
       // Get any url metadata
       const metadataList = await getMetadataList(content)
+
+      // Get any file attached
+      let attachment = file ? await uploadFile(file) : null
+      // Append download link to content if it is not an image
+      content += attachment && !['image/jpeg', 'image/png'].includes(attachment.mimetype) 
+        ? `Download attachment from http://localhost:5001/${attachment.path}`
+        : ''
 
       // Update Message
       return Message.findOneAndUpdate(

@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5db9b12a83c58d3342d5582a"},"isVerified":true,"name":"Mr. Foo","email":"foo@foo.com","password":"$2a$10$idfTd2SRa6rct77QGS/Eeurhrlr8i2rHN7ngWHu0VdsYGVreJRRbm","createdAt":{"$date":{"$numberLong":"1572450602561"}},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5db9b15a83c58d3342d5582c"},"isVerified":true,"name":"Mr. Bar","email":"bar@bar.com","password":"$2a$10$1chyJ5M85bt/H1aPcCAOp.hoYs4UXYXMXkOK22taqVVx61rpkhbBe","createdAt":{"$date":{"$numberLong":"1572450650121"}},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5db9b17983c58d3342d5582e"},"isVerified":true,"name":"Mr. Baz","email":"baz@baz.com","password":"$2a$10$K4PUo.vrIJXiLwkYucBEXufGfW1Z0Q/joZHxXxh6vgAK1ATBLm2gW","createdAt":{"$date":{"$numberLong":"1572450681124"}},"__v":{"$numberInt":"0"}}
