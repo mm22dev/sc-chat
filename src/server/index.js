@@ -9,7 +9,7 @@ const startServer = async () => {
 
   await connectToMongoDB()
 
-  const typeDefs = readFileSync('./src/server/typeDefs.graphql', 'UTF-8')
+  const typeDefs = readFileSync('./src/server/schema/typeDefs.graphql', 'UTF-8')
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
@@ -22,7 +22,7 @@ const startServer = async () => {
 
   app.listen({port: 5001}, () => {
     console.log('🚀 Server running on http://localhost:5001')
-    console.log(`GraphQL Server running	at http://localhost:5001${apolloServer.graphqlPath}`)
+    console.log(`GraphQL Server running at http://localhost:5001${apolloServer.graphqlPath}`)
   })
 }
 

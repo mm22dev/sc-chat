@@ -1,20 +1,18 @@
 const jwt = require('jsonwebtoken')
 const User = require('../../models/User')
 
-const verifyAuthToken = async (token) => {  
+const verifyAuthToken = async token => {  
   try {
 
     // By default user is unauthenticated
-    let authToken = null,
-    currentUser = null
+    const authToken = token ? token : null
+    let currentUser = null
 
     // If token is provided and is valid, provide token and authenticated user to Apollo Server ctx
-    if(token){  
+    if(authToken){  
       try {
-        
-        authToken = token
 
-        // Get user from user id in jwt payload
+        // Get user id from jwt payload
         const decodedJwt = jwt.verify(authToken, process.env.SC_JWT_SECRET || '123456')
         const userId = decodedJwt.hasOwnProperty("userId") ? decodedJwt.userId : null
         const user = userId ? await User.findById(userId) : null
@@ -29,7 +27,7 @@ const verifyAuthToken = async (token) => {
           }  
 
       } catch (err) {
-        console.error(err)
+        console.log(err)
       }
     }
 
