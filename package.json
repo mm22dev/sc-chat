@@ -1,13 +1,14 @@
 {
   "name": "sc_chat",
   "version": "1.0.0",
-  "description": "Basic JS Chat",
+  "description": "Basic MERNG Chat",
   "main": "server.js",
   "scripts": {
-    "clear": "rm -f server.js server.js.map",
+    "clear": "rm -f server.js server.js.map dist",
     "build-dev-server": "webpack --mode development --config webpack.server.config.js",
     "server": "concurrently \"npm run build-dev-server -- -w\" \"nodemon server.js\"",
     "build-dev-client": "webpack --mode development --config webpack.client.config.js",
+    "install": "npm install",
     "client": "npm run build-dev-client -- -w",
     "start": "concurrently \"npm run server\" \"npm run client\""
   },
@@ -17,6 +18,11 @@
   },
   "keywords": [
     "chat",
+    "MERNG",
+    "Mongo",
+    "Express",
+    "React",
+    "Node",
     "GraphQL"
   ],
   "author": "mm22dev",
@@ -42,6 +48,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
+    "apollo-boost": "^0.4.4",
     "apollo-server-express": "^2.9.7",
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
@@ -51,7 +58,10 @@
     "mongoose": "^5.7.7",
     "nodemailer": "^6.3.1",
     "react": "^16.11.0",
+    "react-apollo": "^3.1.3",
     "react-dom": "^16.11.0",
+    "react-router-dom": "^5.1.2",
+    "semantic-ui-react": "^0.88.1",
     "url-metadata": "^2.4.0",
     "validator": "^11.1.0"
   }
