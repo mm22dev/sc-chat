@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "apollo-boost": "^0.4.4",
-    "apollo-server-express": "^2.9.7",
+    "apollo-server-express": "^2.14.2",
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "get-urls": "^9.2.0",
