@@ -63,6 +63,6 @@
     "react-router-dom": "^5.1.2",
     "semantic-ui-react": "^0.88.1",
     "url-metadata": "^2.4.0",
-    "validator": "^11.1.0"
+    "validator": "^13.7.0"
   }
 }
